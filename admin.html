@@ -9,7 +9,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Same styles as provided */
     * {
       margin: 0;
       padding: 0;
@@ -172,7 +171,7 @@
       </div>
       <button id="loginButton">Login</button>
       <p id="loginStatus"></p>
-      <button class="back" onclick="window.location.href='/Sanmati-Elections/index.html'">⬅ Back to Voting</button>
+      <button class="back" onclick="window.location.href='https://devvvvvvv7.github.io/Sanmati-Elections2/'">⬅ Back to Voting</button>
     </div>
     <div id="adminPanel" style="display: none;">
       <h2>
@@ -183,7 +182,7 @@
       <div id="results"></div>
       <button class="reset" onclick="resetVotes()">🔄 Reset All Votes</button>
       <button onclick="logout()">🚪 Logout</button>
-      <button class="back" onclick="window.location.href='/Sanmati-Elections/index.html'">⬅ Back to Voting</button>
+      <button class="back" onclick="window.location.href='https://devvvvvvv7.github.io/Sanmati-Elections2/'">⬅ Back to Voting</button>
     </div>
   </div>
   <script>
@@ -320,7 +319,7 @@
             }
           }
           postDiv.innerHTML += `<p>Winner: ${winner || "No votes yet"} (${maxVotes || 0} votes)</p>`;
-          postDiv.innerHTML += `<button class="details" onclick="window.location.href='/Sanmati-Elections/details.html?post=${post}'">View Detailed Votes</button>`;
+          postDiv.innerHTML += `<button class="details" onclick="window.location.href='https://devvvvvvv7.github.io/Sanmati-Elections2/details.html?post=${post}'">View Detailed Votes</button>`;
           resultDiv.appendChild(postDiv);
         });
       }, error => {
