@@ -187,8 +187,8 @@
             if (data && data.role === "user") {
               document.getElementById("loginSection").style.display = "none";
               document.getElementById("votingSection").style.display = "block";
-              document.getElementById("logoutButton").style.display = "none"; // Hidden by default
-              document.getElementById("adminLink").style.display = "none"; // Hidden by default
+              document.getElementById("logoutButton").style.display = "none";
+              document.getElementById("adminLink").style.display = "none";
               loginStatus.innerText = "";
             } else {
               auth.signOut();
@@ -288,13 +288,16 @@
     }
 
     function logout() {
+      console.log("Logout initiated");
       auth.signOut().then(() => {
+        console.log("User signed out successfully");
         document.getElementById("loginSection").style.display = "block";
         document.getElementById("votingSection").style.display = "none";
         document.getElementById("logoutButton").style.display = "none";
         document.getElementById("adminLink").style.display = "none";
         window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
       }).catch(err => {
+        console.error("Logout error:", err.message);
         document.getElementById("status").innerText = `Error logging out: ${err.message}`;
         document.getElementById("status").classList.add("error");
         setTimeout(() => {
@@ -305,17 +308,23 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Ensure initial state
+      document.getElementById("logoutButton").style.display = "none";
+      document.getElementById("adminLink").style.display = "none";
+
       auth.onAuthStateChanged(user => {
         if (user) {
           db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
             const data = snapshot.val();
             if (data && data.role === "user") {
+              console.log("User authenticated, showing voting section");
               document.getElementById("loginSection").style.display = "none";
               document.getElementById("votingSection").style.display = "block";
-              document.getElementById("logoutButton").style.display = "none"; // Hidden by default
-              document.getElementById("adminLink").style.display = "none"; // Hidden by default
+              document.getElementById("logoutButton").style.display = "none";
+              document.getElementById("adminLink").style.display = "none";
             } else {
               auth.signOut();
+              console.log("Access denied: Not a user account");
               document.getElementById("loginStatus").innerText = "Access denied: Not a user account.";
               document.getElementById("loginStatus").classList.add("error");
               setTimeout(() => {
@@ -325,34 +334,42 @@
             }
           });
         } else {
+          console.log("No user authenticated, showing login section");
           document.getElementById("loginSection").style.display = "block";
           document.getElementById("votingSection").style.display = "none";
+          document.getElementById("logoutButton").style.display = "none";
+          document.getElementById("adminLink").style.display = "none";
         }
       });
 
+      let isEPressed = false;
       document.addEventListener('keydown', (event) => {
         if (event.ctrlKey && event.shiftKey) {
-          if (event.key === '1') {
-            event.preventDefault();
-            const logoutButton = document.getElementById("logoutButton");
-            const adminLink = document.getElementById("adminLink");
-            if (logoutButton.style.display === "none") {
-              logoutButton.style.display = "block";
-              adminLink.style.display = "none";
-            } else {
-              logoutButton.style.display = "none";
+          if (event.key === 'E' || event.key === 'e') {
+            isEPressed = true;
+            console.log("Ctrl+Shift+E pressed");
+          } else if (event.key === 'P' || event.key === 'p') {
+            if (isEPressed) {
+              event.preventDefault();
+              console.log("Ctrl+Shift+E+P detected: Toggling logout button");
+              const logoutButton = document.getElementById("logoutButton");
+              logoutButton.style.display = logoutButton.style.display === "none" ? "block" : "none";
+              document.getElementById("adminLink").style.display = "none";
             }
           } else if (event.key === 'A' || event.key === 'a') {
             event.preventDefault();
+            console.log("Ctrl+Shift+A pressed: Toggling admin link");
             const adminLink = document.getElementById("adminLink");
-            const logoutButton = document.getElementById("logoutButton");
-            if (adminLink.style.display === "none") {
-              adminLink.style.display = "block";
-              logoutButton.style.display = "none";
-            } else {
-              adminLink.style.display = "none";
-            }
+            adminLink.style.display = adminLink.style.display === "none" ? "block" : "none";
+            document.getElementById("logoutButton").style.display = "none";
           }
+        }
+      });
+
+      document.addEventListener('keyup', (event) => {
+        if (event.key === 'E' || event.key === 'e') {
+          isEPressed = false;
+          console.log("Ctrl+Shift+E released");
         }
       });
     });
