@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Sanmati Higher Secondary School Election</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Same styles as provided */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0e7ff, #c3dafe);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #1e40af;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h2 img {
+      width: 40px;
+      height: 40px;
+    }
+    h4 {
+      color: #1f2937;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: capitalize;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #1f2937;
+      background: #f9fafb;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button.reset {
+      background: #dc2626;
+    }
+    button.reset:hover {
+      background: #b91c1c;
+    }
+    button.details {
+      background: #10b981;
+      width: auto;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+    button.details:hover {
+      background: #059669;
+    }
+    button.back {
+      background: #6b7280;
+    }
+    button.back:hover {
+      background: #4b5563;
+    }
+    #loginStatus, #resultsStatus {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #dc2626;
+    }
+    #resultsStatus.success {
+      color: #15803d;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    .post {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid #e5e7eb;
+    }
+    .post p {
+      font-size: 1rem;
+      color: #1f2937;
+      margin: 5px 0;
+    }
+    @media (max-width: 480px) {
+      .container { padding: 20px; }
+      h2 { font-size: 1.5rem; }
+      button { font-size: 1rem; padding: 12px; }
+      h4 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="loginSection">
+      <h2>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShMvk58PfOhHr55_V-XRPYHM45sW4zFrsMOA&s" alt="Sanmati Logo">
+        Admin Login - Sanmati Higher Secondary School
+      </h2>
+      <div class="form-group">
+        <label for="adminEmail">Email</label>
+        <input type="email" id="adminEmail" placeholder="Enter Admin Email" required>
+      </div>
+      <div class="form-group">
+        <label for="adminPass">Password</label>
+        <input type="password" id="adminPass" placeholder="Enter Password" required>
+      </div>
+      <button id="loginButton">Login</button>
+      <p id="loginStatus"></p>
+      <button class="back" onclick="window.location.href='/Sanmati-Elections/index.html'">⬅ Back to Voting</button>
+    </div>
+    <div id="adminPanel" style="display: none;">
+      <h2>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn; alt="Sanmati Logo">
+        Live Voting Results
+      </h2>
+      <p id="resultsStatus"></p>
+      <div id="results"></div>
+      <button class="reset" onclick="resetVotes()">🔄 Reset All Votes</button>
+      <button onclick="logout()">🚪 Logout</button>
+      <button class="back" onclick="window.location.href='/Sanmati-Elections/index.html'">⬅ Back to Voting</button>
+    </div>
+  </div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZG1FGVgZZc2uglqYSHHmwCnG6oqhoClU",
+      authDomain: "e-voting-33cd9.firebaseapp.com",
+      databaseURL: "https://e-voting-33cd9-default-rtdb.firebaseio.com",
+      projectId: "e-voting-33cd9",
+      storageBucket: "e-voting-33cd9.firebasestorage.app",
+      messagingSenderId: "570288641949",
+      appId: "1:570288641949:web:5e8c6d3757a93a8df74174",
+      measurementId: "G-C01THSMTX4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const posts = ["disciplineAdvisor", "culturalAdvisor", "culturalMinister", "homeChiefMinister"];
+
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    function adminLogin() {
+      const email = document.getElementById("adminEmail").value.trim();
+      const pass = document.getElementById("adminPass").value;
+      const loginStatus = document.getElementById("loginStatus");
+      if (!email || !isValidEmail(email)) {
+        loginStatus.innerText = "Please enter a valid email address.";
+        loginStatus.classList.add("error");
+        setTimeout(() => {
+          loginStatus.innerText = "";
+          loginStatus.classList.remove("error");
+        }, 3000);
+        return;
+      }
+      if (!pass) {
+        loginStatus.innerText = "Please enter a password.";
+        loginStatus.classList.add("error");
+        setTimeout(() => {
+          loginStatus.innerText = "";
+          loginStatus.classList.remove("error");
+        }, 3000);
+        return;
+      }
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(userCredential => {
+          const user = userCredential.user;
+          db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
+            const data = snapshot.val();
+            if (data && data.role === "admin") {
+              document.getElementById("loginSection").style.display = "none";
+              document.getElementById("adminPanel").style.display = "block";
+              loginStatus.innerText = "";
+              loadResults();
+            } else {
+              auth.signOut();
+              loginStatus.innerText = "Access denied: Not an admin account.";
+              loginStatus.classList.add("error");
+              setTimeout(() => {
+                loginStatus.innerText = "";
+                loginStatus.classList.remove("error");
+              }, 3000);
+            }
+          });
+        })
+        .catch(err => {
+          loginStatus.innerText = `Authentication failed: ${err.message}`;
+          loginStatus.classList.add("error");
+          setTimeout(() => {
+            loginStatus.innerText = "";
+            loginStatus.classList.remove("error");
+          }, 3000);
+        });
+    }
+
+    function logout() {
+      auth.signOut().then(() => {
+        document.getElementById("loginSection").style.display = "block";
+        document.getElementById("adminPanel").style.display = "none";
+        document.getElementById("results").innerHTML = "";
+        document.getElementById("resultsStatus").innerText = "";
+        document.getElementById("adminEmail").value = "";
+        document.getElementById("adminPass").value = "";
+      }).catch(err => {
+        document.getElementById("resultsStatus").innerText = `Error logging out: ${err.message}`;
+        document.getElementById("resultsStatus").classList.remove("success");
+      });
+    }
+
+    function resetVotes() {
+      if (confirm("Are you sure you want to reset all votes? This cannot be undone.")) {
+        db.ref("votes").remove().then(() => {
+          document.getElementById("results").innerHTML = "";
+          document.getElementById("resultsStatus").innerText = "✅ Results cleared successfully!";
+          document.getElementById("resultsStatus").classList.add("success");
+          loadResults();
+        }).catch(err => {
+          document.getElementById("resultsStatus").innerText = `Error resetting votes: ${err.message}`;
+          document.getElementById("resultsStatus").classList.remove("success");
+        });
+      }
+    }
+
+    function loadResults() {
+      db.ref("votes").on("value", snapshot => {
+        const allVotes = snapshot.val() || {};
+        const counts = {};
+        posts.forEach(post => counts[post] = {});
+        for (let voterId in allVotes) {
+          const vote = allVotes[voterId].votes;
+          posts.forEach(post => {
+            const choice = vote[post];
+            if (choice) {
+              counts[post][choice] = (counts[post][choice] || 0) + 1;
+            }
+          });
+        }
+        const resultDiv = document.getElementById("results");
+        resultDiv.innerHTML = "";
+        document.getElementById("resultsStatus").innerText = "✅ Results loaded successfully!";
+        document.getElementById("resultsStatus").classList.add("success");
+        posts.forEach(post => {
+          const postDiv = document.createElement("div");
+          postDiv.className = "post";
+          postDiv.innerHTML = `<h4>${post.replace(/([A-Z])/g, " $1")}</h4>`;
+          const candidates = counts[post];
+          let winner = null;
+          let maxVotes = 0;
+          for (let candidate in candidates) {
+            if (candidates[candidate] > maxVotes) {
+              maxVotes = candidates[candidate];
+              winner = candidate;
+            }
+          }
+          postDiv.innerHTML += `<p>Winner: ${winner || "No votes yet"} (${maxVotes || 0} votes)</p>`;
+          postDiv.innerHTML += `<button class="details" onclick="window.location.href='/Sanmati-Elections/details.html?post=${post}'">View Detailed Votes</button>`;
+          resultDiv.appendChild(postDiv);
+        });
+      }, error => {
+        document.getElementById("resultsStatus").innerText = `Error loading results: ${error.message}`;
+        document.getElementById("resultsStatus").classList.remove("success");
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
+            const data = snapshot.val();
+            if (data && data.role === "admin") {
+              document.getElementById("loginSection").style.display = "none";
+              document.getElementById("adminPanel").style.display = "block";
+              document.getElementById("loginStatus").innerText = "";
+              loadResults();
+            } else {
+              auth.signOut();
+              document.getElementById("loginStatus").innerText = "Access denied: Not an admin account.";
+              document.getElementById("loginSection").style.display = "block";
+              document.getElementById("adminPanel").style.display = "none";
+              document.getElementById("results").innerHTML = "";
+              document.getElementById("resultsStatus").innerText = "";
+            }
+          });
+        } else {
+          document.getElementById("loginSection").style.display = "block";
+          document.getElementById("adminPanel").style.display = "none";
+          document.getElementById("results").innerHTML = "";
+          document.getElementById("resultsStatus").innerText = "";
+        }
+      });
+      document.getElementById("loginButton").addEventListener("click", adminLogin);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sanmati Higher Secondary School Election Voting</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Same styles as provided */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0e7ff, #c3dafe);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #1e40af;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h2 img {
+      width: 40px;
+      height: 40px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #1f2937;
+      background: #f9fafb;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    #status, #loginStatus {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #15803d;
+    }
+    #status.error, #loginStatus.error {
+      color: #dc2626;
+    }
+    #adminLink {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #adminLink a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.3s;
+    }
+    #adminLink a:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+    @media (max-width: 480px) {
+      .container { padding: 20px; }
+      h2 { font-size: 1.5rem; }
+      button { font-size: 1rem; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="loginSection">
+      <h2>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShMvk58PfOhHr55_V-XRPYHM45sW4zFrsMOA&s" alt="Ballot Box">
+        Voter Login
+      </h2>
+      <div class="form-group">
+        <label for="userEmail">Email</label>
+        <input type="email" id="userEmail" placeholder="Enter Email" required>
+      </div>
+      <div class="form-group">
+        <label for="userPass">Password</label>
+        <input type="password" id="userPass" placeholder="Enter Password" required>
+      </div>
+      <button onclick="userLogin()">Login</button>
+      <p id="loginStatus"></p>
+    </div>
+    <div id="votingSection" style="display: none;">
+      <h2>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShMvk58PfOhHr55_V-XRPYHM45sW4zFrsMOA&s" alt="Ballot Box">
+        Sanmati Higher Secondary School Election Voting
+      </h2>
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="Enter Your Full Name" required>
+      </div>
+      <div class="form-group">
+        <label for="class">Class</label>
+        <select id="class">
+          <option value="">Select Class</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="section">Section</label>
+        <select id="section">
+          <option value="">Select Section</option>
+          <option>A</option>
+          <option>B</option>
+          <option>C</option>
+          <option>D</option>
+          <option>E</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="disciplineAdvisor">Discipline Advisor</label>
+        <select id="disciplineAdvisor">
+          <option value="">Vote for Discipline Advisor</option>
+          <option>Pratyaksh Kumar</option>
+          <option>Pihu Gupta</option>
+          <option>Ananya Jain</option>
+          <option>Sonia Khan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="culturalAdvisor">Cultural Advisor</label>
+        <select id="culturalAdvisor">
+          <option value="">Vote for Cultural Advisor</option>
+          <option>Kirtan Joshi</option>
+          <option>Taniya Yadav</option>
+          <option>Nayan Verma</option>
+          <option>Vaishnavi Mishra</option>
+          <option>Kanika Patidar</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="culturalMinister">Cultural Minister</label>
+        <select id="culturalMinister">
+          <option value="">Vote for Cultural Minister</option>
+          <option>Gainell Garg</option>
+          <option>Samriddhi Chandak</option>
+          <option>Anshika Khandelwal</option>
+          <option>Anvesha Motwani</option>
+          <option>Aartik Garg</option>
+          <option>Nishtha Bansal</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="homeChiefMinister">Home Chief Minister</label>
+        <select id="homeChiefMinister">
+          <option value="">Vote for Home Chief Minister</option>
+          <option>Sanjana Pandey</option>
+          <option>Swastik Chandak</option>
+          <option>Yashi Khandelwal</option>
+          <option>Vedang Yadav</option>
+          <option>Vedika Talwar</option>
+          <option>Lavisha Nahar</option>
+          <option>Gunit Naulkha</option>
+        </select>
+      </div>
+      <button onclick="submitVote()">Submit Vote</button>
+      <p id="status"></p>
+      <div id="adminLink">
+        <a href="/Sanmati-Elections/admin.html">Admin Login</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZG1FGVgZZc2uglqYSHHmwCnG6oqhoClU",
+      authDomain: "e-voting-33cd9.firebaseapp.com",
+      databaseURL: "https://e-voting-33cd9-default-rtdb.firebaseio.com",
+      projectId: "e-voting-33cd9",
+      storageBucket: "e-voting-33cd9.firebasestorage.app",
+      messagingSenderId: "570288641949",
+      appId: "1:570288641949:web:5e8c6d3757a93a8df74174",
+      measurementId: "G-C01THSMTX4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    function userLogin() {
+      const email = document.getElementById("userEmail").value.trim();
+      const pass = document.getElementById("userPass").value;
+      const loginStatus = document.getElementById("loginStatus");
+      if (!email || !isValidEmail(email)) {
+        loginStatus.innerText = "Please enter a valid email address.";
+        loginStatus.classList.add("error");
+        setTimeout(() => {
+          loginStatus.innerText = "";
+          loginStatus.classList.remove("error");
+        }, 3000);
+        return;
+      }
+      if (!pass) {
+        loginStatus.innerText = "Please enter a password.";
+        loginStatus.classList.add("error");
+        setTimeout(() => {
+          loginStatus.innerText = "";
+          loginStatus.classList.remove("error");
+        }, 3000);
+        return;
+      }
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(userCredential => {
+          const user = userCredential.user;
+          db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
+            const data = snapshot.val();
+            if (data && data.role === "user") {
+              document.getElementById("loginSection").style.display = "none";
+              document.getElementById("votingSection").style.display = "block";
+              loginStatus.innerText = "";
+            } else {
+              auth.signOut();
+              loginStatus.innerText = "Access denied: Not a user account.";
+              loginStatus.classList.add("error");
+              setTimeout(() => {
+                loginStatus.innerText = "";
+                loginStatus.classList.remove("error");
+              }, 3000);
+            }
+          });
+        })
+        .catch(err => {
+          loginStatus.innerText = `Login failed: ${err.message}`;
+          loginStatus.classList.add("error");
+          setTimeout(() => {
+            loginStatus.innerText = "";
+            loginStatus.classList.remove("error");
+          }, 3000);
+        });
+    }
+
+    function submitVote() {
+      const user = auth.currentUser;
+      if (!user) {
+        document.getElementById("status").innerText = "Please log in to vote.";
+        document.getElementById("status").classList.add("error");
+        setTimeout(() => {
+          document.getElementById("status").innerText = "";
+          document.getElementById("status").classList.remove("error");
+        }, 3000);
+        return;
+      }
+      const name = document.getElementById("name").value.trim();
+      const cls = document.getElementById("class").value;
+      const sec = document.getElementById("section").value;
+      const da = document.getElementById("disciplineAdvisor").value;
+      const ca = document.getElementById("culturalAdvisor").value;
+      const cm = document.getElementById("culturalMinister").value;
+      const hcm = document.getElementById("homeChiefMinister").value;
+      const status = document.getElementById("status");
+      if (!name || !cls || !sec || !da || !ca || !cm || !hcm) {
+        status.innerText = "Please fill out all fields!";
+        status.classList.add("error");
+        setTimeout(() => {
+          status.innerText = "";
+          status.classList.remove("error");
+        }, 3000);
+        return;
+      }
+      const voteUid = name + "_" + cls + sec;
+      const voteRef = db.ref("votes/" + voteUid);
+      voteRef.once("value", snapshot => {
+        if (snapshot.exists()) {
+          status.innerText = "You have already voted.";
+          status.classList.add("error");
+          setTimeout(() => {
+            status.innerText = "";
+            status.classList.remove("error");
+          }, 3000);
+        } else {
+          voteRef.set({
+            name: name,
+            class: cls,
+            section: sec,
+            votes: {
+              disciplineAdvisor: da,
+              culturalAdvisor: ca,
+              culturalMinister: cm,
+              homeChiefMinister: hcm
+            },
+            userId: user.uid // Store user UID for tracking
+          }).then(() => {
+            status.innerText = "✅ Vote submitted successfully!";
+            status.classList.remove("error");
+            document.getElementById("name").value = "";
+            document.getElementById("class").value = "";
+            document.getElementById("section").value = "";
+            document.getElementById("disciplineAdvisor").value = "";
+            document.getElementById("culturalAdvisor").value = "";
+            document.getElementById("culturalMinister").value = "";
+            document.getElementById("homeChiefMinister").value = "";
+            setTimeout(() => {
+              status.innerText = "";
+              status.classList.remove("error");
+            }, 3000);
+          }).catch(err => {
+            status.innerText = `Error submitting vote: ${err.message}`;
+            status.classList.add("error");
+            setTimeout(() => {
+              status.innerText = "";
+              status.classList.remove("error");
+            }, 3000);
+          });
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
+            const data = snapshot.val();
+            if (data && data.role === "user") {
+              document.getElementById("loginSection").style.display = "none";
+              document.getElementById("votingSection").style.display = "block";
+            } else {
+              auth.signOut();
+              document.getElementById("loginStatus").innerText = "Access denied: Not a user account.";
+              document.getElementById("loginStatus").classList.add("error");
+              setTimeout(() => {
+                document.getElementById("loginStatus").innerText = "";
+                document.getElementById("loginStatus").classList.remove("error");
+              }, 3000);
+            }
+          });
+        } else {
+          document.getElementById("loginSection").style.display = "block";
+          document.getElementById("votingSection").style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

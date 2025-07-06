@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detailed Votes - Sanmati Higher Secondary School Election</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Same styles as provided */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0e7ff, #c3dafe);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #1e40af;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    h4 {
+      color: #1f2937;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: capitalize;
+    }
+    .vote-list {
+      margin-bottom: 20px;
+    }
+    .vote-list p {
+      font-size: 1rem;
+      color: #1f2937;
+      margin: 5px 0;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    #status {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #dc2626;
+    }
+    #status.success {
+      color: #15803d;
+    }
+    @media (max-width: 480px) {
+      .container { padding: 20px; }
+      h2 { font-size: 1.5rem; }
+      h4 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Detailed Votes - Sanmati Higher Secondary School</h2>
+    <div id="voteDetails"></div>
+    <p科普
+
+System: id="status"></p>
+    < Cedric button onclick="window.location.href='/Sanmati-Elections/admin.html'">Back to Admin Panel</button>
+  </div>
+  <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZG1FGVgZZc2uglqYSHHmwCnG6oqhoClU",
+    authDomain: "e-voting-33cd9.firebaseapp.com",
+    databaseURL: "https://e-voting-33cd9-default-rtdb.firebaseio.com",
+    projectId: "e-voting-33cd9",
+    storageBucket: "e-voting-33cd9.firebasestorage.app",
+    messagingSenderId: "570288641949",
+    appId: "1:570288641949:web:5e8c6d3757a93a8df74174",
+    measurementId: "G-C01THSMTX4"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+  const posts = ["disciplineAdvisor", "culturalAdvisor", "culturalMinister", "homeChiefMinister"];
+  const candidates = {
+    disciplineAdvisor: ["Pratyaksh Kumar", "Pihu Gupta", "Ananya Jain", "Sonia Khan"],
+    culturalAdvisor: ["Kirtan Joshi", "Taniya Yadav", "Nayan Verma", "Vaishnavi Mishra", "Kanika Patidar"],
+    culturalMinister: ["Gainell Garg", "Samriddhi Chandak", "Anshika Khandelwal", "Anvesha Motwani", "Aartik Garg", "Nishtha Bansal"],
+    homeChiefMinister: ["Sanjana Pandey", "Swastik Chandak", "Yashi Khandelwal", "Vedang Yadav", "Vedika Talwar", "Lavisha Nahar", "Gunit Naulkha"]
+  };
+
+  function loadDetailedVotes() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const post = urlParams.get('post');
+    if (!post || !posts.includes(post)) {
+      document.getElementById("voteDetails").innerHTML = "<p>Invalid post selected.</p>";
+      document.getElementById("status").innerText = "Error: Invalid post.";
+      document.getElementById("status").classList.remove("success");
+      return;
+    }
+
+    db.ref("votes").once("value", snapshot => {
+      const allVotes = snapshot.val() || {};
+      const voteCounts = {};
+      candidates[post].forEach(candidate => {
+        voteCounts[candidate] = 0;
+      });
+
+      for (let uid in allVotes) {
+        const vote = allVotes[uid].votes[post];
+        if (vote && candidates[post].includes(vote)) {
+          voteCounts[vote]++;
+        }
+      }
+
+      const detailsDiv = document.getElementById("voteDetails");
+      detailsDiv.innerHTML = `<h4>${post.replace(/([A-Z])/g, " $1")}</h4>`;
+      candidates[post].forEach(candidate => {
+        detailsDiv.innerHTML += `<p>${candidate}: ${voteCounts[candidate]} vote(s)</p>`;
+      });
+      document.getElementById("status").innerText = "✅ Details loaded successfully!";
+      document.getElementById("status").classList.add("success");
+    }, error => {
+      document.getElementById("voteDetails").innerHTML = "<p>Error loading votes.</p>";
+      document.getElementById("status").innerText = `Error: ${error.message}`;
+      document.getElementById("status").classList.remove("success");
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "/Sanmati-Elections/admin.html";
+        return;
+      }
+      db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
+        const data = snapshot.val();
+        if (data && data.role === "admin") {
+          loadDetailedVotes();
+        } else {
+          auth.signOut();
+          window.location.href = "/Sanmati-Elections/admin.html";
+          document.getElementById("status").innerText = "Access denied: Not an admin account.";
+          document.getElementById("status").classList.remove("success");
+        }
+      });
+    });
+  });
+</script>
