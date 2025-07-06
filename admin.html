@@ -196,9 +196,11 @@
       appId: "1:570288641949:web:5e8c6d3757a93a8df74174",
       measurementId: "G-C01THSMTX4"
     };
+
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.database;
+    const db = firebase.database(); // Ensure database is properly initialized
     const posts = ["disciplineAdvisor", "culturalAdvisor", "culturalMinister", "homeChiefMinister"];
 
     // Set session persistence to keep user logged in
@@ -339,6 +341,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Ensure Firebase database is initialized
+      if (!firebase.database) {
+        console.error("Firebase database module not loaded correctly");
+        document.getElementById("loginStatus").innerText = "Error: Firebase database not initialized.";
+        return;
+      }
+
       auth.onAuthStateChanged(user => {
         if (user) {
           db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
@@ -374,6 +383,7 @@
           document.getElementById("resultsStatus").innerText = "";
         }
       });
+
       document.getElementById("loginButton").addEventListener("click", adminLogin);
     });
   </script>
