@@ -138,6 +138,7 @@
     </div>
   </div>
   <script>
+    console.log("Starting index.html initialization");
     const firebaseConfig = {
       apiKey: "AIzaSyDZG1FGVgZZc2uglqYSHHmwCnG6oqhoClU",
       authDomain: "e-voting-33cd9.firebaseapp.com",
@@ -148,9 +149,11 @@
       appId: "1:570288641949:web:5e8c6d3757a93a8df74174",
       measurementId: "G-C01THSMTX4"
     };
+    console.log("Initializing Firebase with config:", firebaseConfig);
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
+    console.log("Firebase auth and database initialized");
 
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
       .then(() => {
@@ -161,15 +164,19 @@
       });
 
     function isValidEmail(email) {
+      console.log("Validating email:", email);
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     }
 
     function userLogin() {
+      console.log("userLogin function called");
       const email = document.getElementById("userEmail").value.trim();
       const pass = document.getElementById("userPass").value;
       const loginStatus = document.getElementById("loginStatus");
+      console.log("Login attempt with email:", email);
       if (!email || !isValidEmail(email)) {
+        console.log("Invalid email entered");
         loginStatus.innerText = "Please enter a valid email address.";
         loginStatus.classList.add("error");
         setTimeout(() => {
@@ -179,6 +186,7 @@
         return;
       }
       if (!pass) {
+        console.log("No password entered");
         loginStatus.innerText = "Please enter a password.";
         loginStatus.classList.add("error");
         setTimeout(() => {
@@ -187,21 +195,31 @@
         }, 3000);
         return;
       }
+      console.log("Attempting Firebase sign-in");
       auth.signInWithEmailAndPassword(email, pass)
         .then(userCredential => {
+          console.log("Sign-in successful, user UID:", userCredential.user.uid);
           const user = userCredential.user;
           db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
             const data = snapshot.val();
+            console.log("User data from authorizedUsers:", data);
             if (data && data.role === "user") {
+              console.log("User role is 'user', showing voting section");
               document.getElementById("loginSection").style.display = "none";
               document.getElementById("votingSection").style.display = "block";
               document.getElementById("logoutButton").style.display = "none";
               document.getElementById("adminLink").style.display = "none";
               loginStatus.innerText = "";
             } else if (data && data.role === "admin") {
-              console.log("Admin authenticated, redirecting to admin panel");
-              window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/admin.html";
+              console.log("User role is 'admin', checking page for redirect");
+              if (window.location.pathname !== "/Sanmati-Elections2/admin.html") {
+                console.log("Redirecting to admin.html");
+                window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/admin.html";
+              } else {
+                console.log("Already on admin.html, no redirect needed");
+              }
             } else {
+              console.log("Invalid account, signing out");
               auth.signOut();
               loginStatus.innerText = "Access denied: Invalid account.";
               loginStatus.classList.add("error");
@@ -210,9 +228,18 @@
                 loginStatus.classList.remove("error");
               }, 3000);
             }
+          }, err => {
+            console.error("Error fetching user role:", err.message);
+            loginStatus.innerText = `Error checking user role: ${err.message}`;
+            loginStatus.classList.add("error");
+            setTimeout(() => {
+              loginStatus.innerText = "";
+              loginStatus.classList.remove("error");
+            }, 3000);
           });
         })
         .catch(err => {
+          console.error("Login failed:", err.message);
           loginStatus.innerText = `Login failed: ${err.message}`;
           loginStatus.classList.add("error");
           setTimeout(() => {
@@ -223,8 +250,10 @@
     }
 
     function submitVote() {
+      console.log("submitVote function called");
       const user = auth.currentUser;
       if (!user) {
+        console.log("No user logged in");
         document.getElementById("status").innerText = "Please log in to vote.";
         document.getElementById("status").classList.add("error");
         setTimeout(() => {
@@ -233,6 +262,7 @@
         }, 3000);
         return;
       }
+      console.log("User is logged in, UID:", user.uid);
       const name = document.getElementById("name").value.trim();
       const cls = document.getElementById("class").value;
       const sec = document.getElementById("section").value;
@@ -241,7 +271,9 @@
       const cm = document.getElementById("culturalMinister").value;
       const hcm = document.getElementById("homeChiefMinister").value;
       const status = document.getElementById("status");
+      console.log("Vote inputs:", { name, cls, sec, da, ca, cm, hcm });
       if (!name || !cls || !sec || !da || !ca || !cm || !hcm) {
+        console.log("Missing form fields");
         status.innerText = "Please fill out all fields!";
         status.classList.add("error");
         setTimeout(() => {
@@ -251,9 +283,11 @@
         return;
       }
       const voteUid = name + "_" + cls + sec;
+      console.log("Generated vote UID:", voteUid);
       const voteRef = db.ref("votes/" + voteUid);
       voteRef.once("value", snapshot => {
         if (snapshot.exists()) {
+          console.log("Vote already exists for UID:", voteUid);
           status.innerText = "You have already voted.";
           status.classList.add("error");
           setTimeout(() => {
@@ -261,6 +295,7 @@
             status.classList.remove("error");
           }, 3000);
         } else {
+          console.log("Submitting new vote");
           voteRef.set({
             name: name,
             class: cls,
@@ -273,6 +308,7 @@
             },
             userId: user.uid
           }).then(() => {
+            console.log("Vote submitted successfully");
             status.innerText = "✅ Vote submitted successfully!";
             status.classList.remove("error");
             document.getElementById("name").value = "";
@@ -287,6 +323,7 @@
               status.classList.remove("error");
             }, 3000);
           }).catch(err => {
+            console.error("Error submitting vote:", err.message);
             status.innerText = `Error submitting vote: ${err.message}`;
             status.classList.add("error");
             setTimeout(() => {
@@ -295,17 +332,29 @@
             }, 3000);
           });
         }
+      }, err => {
+        console.error("Error checking vote existence:", err.message);
+        status.innerText = `Error checking vote: ${err.message}`;
+        status.classList.add("error");
+        setTimeout(() => {
+          status.innerText = "";
+          status.classList.remove("error");
+        }, 3000);
       });
     }
 
     function logout() {
+      console.log("logout function called");
       auth.signOut().then(() => {
+        console.log("User signed out successfully");
         document.getElementById("loginSection").style.display = "block";
         document.getElementById("votingSection").style.display = "none";
         document.getElementById("logoutButton").style.display = "none";
         document.getElementById("adminLink").style.display = "none";
+        console.log("Redirecting to index.html after logout");
         window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
       }).catch(err => {
+        console.error("Error logging out:", err.message);
         document.getElementById("status").innerText = `Error logging out: ${err.message}`;
         document.getElementById("status").classList.add("error");
         setTimeout(() => {
@@ -316,9 +365,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      console.log("DOM content loaded, setting up event listeners");
       document.getElementById("logoutButton").style.display = "none";
       document.getElementById("adminLink").style.display = "none";
 
+      console.log("Setting session persistence");
       firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
         .then(() => {
           console.log("Session persistence set successfully");
@@ -327,22 +378,26 @@
           console.error("Error setting persistence:", err.message);
         });
 
+      console.log("Setting up auth state change listener");
       auth.onAuthStateChanged(user => {
+        console.log("auth.onAuthStateChanged triggered, user:", user ? user.uid : "null");
         if (user) {
+          console.log("Fetching user role for UID:", user.uid);
           db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
             const data = snapshot.val();
+            console.log("User role data:", data);
             if (data && data.role === "user") {
-              console.log("User authenticated, showing voting section");
+              console.log("User role is 'user', showing voting section");
               document.getElementById("loginSection").style.display = "none";
               document.getElementById("votingSection").style.display = "block";
               document.getElementById("logoutButton").style.display = "none";
               document.getElementById("adminLink").style.display = "none";
-            } else if (data && data.role === "admin") {
-              console.log("Admin authenticated, redirecting to admin panel");
+            } else if (data && data.role === "admin" && window.location.pathname !== "/Sanmati-Elections2/admin.html") {
+              console.log("Admin authenticated, redirecting to admin.html");
               window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/admin.html";
             } else {
+              console.log("Invalid account or already on admin.html, signing out");
               auth.signOut();
-              console.log("Access denied: Not a valid account");
               document.getElementById("loginStatus").innerText = "Access denied: Invalid account.";
               document.getElementById("loginStatus").classList.add("error");
               setTimeout(() => {
@@ -350,6 +405,14 @@
                 document.getElementById("loginStatus").classList.remove("error");
               }, 3000);
             }
+          }, err => {
+            console.error("Error fetching user role:", err.message);
+            document.getElementById("loginStatus").innerText = `Error checking user role: ${err.message}`;
+            document.getElementById("loginStatus").classList.add("error");
+            setTimeout(() => {
+              document.getElementById("loginStatus").innerText = "";
+              document.getElementById("loginStatus").classList.remove("error");
+            }, 3000);
           });
         } else {
           console.log("No user authenticated, showing login section");
