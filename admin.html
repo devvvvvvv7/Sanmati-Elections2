@@ -198,8 +198,17 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.database();
+    const db = firebase.database;
     const posts = ["disciplineAdvisor", "culturalAdvisor", "culturalMinister", "homeChiefMinister"];
+
+    // Set session persistence to keep user logged in
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+      .then(() => {
+        console.log("Session persistence set successfully");
+      })
+      .catch(err => {
+        console.error("Error setting persistence:", err.message);
+      });
 
     function isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -267,6 +276,7 @@
         document.getElementById("resultsStatus").innerText = "";
         document.getElementById("adminEmail").value = "";
         document.getElementById("adminPass").value = "";
+        window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
       }).catch(err => {
         document.getElementById("resultsStatus").innerText = `Error logging out: ${err.message}`;
         document.getElementById("resultsStatus").classList.remove("success");
@@ -334,10 +344,12 @@
           db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
             const data = snapshot.val();
             if (data && data.role === "admin") {
-              document.getElementById("loginSection").style.display = "none";
-              document.getElementById("adminPanel").style.display = "block";
-              document.getElementById("loginStatus").innerText = "";
-              loadResults();
+              if (document.getElementById("adminPanel").style.display !== "block") {
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("adminPanel").style.display = "block";
+                document.getElementById("loginStatus").innerText = "";
+                loadResults();
+              }
             } else {
               auth.signOut();
               document.getElementById("loginStatus").innerText = "Access denied: Not an admin account.";
@@ -345,7 +357,15 @@
               document.getElementById("adminPanel").style.display = "none";
               document.getElementById("results").innerHTML = "";
               document.getElementById("resultsStatus").innerText = "";
+              window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
             }
+          }).catch(err => {
+            document.getElementById("loginStatus").innerText = `Error checking user role: ${err.message}`;
+            document.getElementById("loginSection").style.display = "block";
+            document.getElementById("adminPanel").style.display = "none";
+            document.getElementById("results").innerHTML = "";
+            document.getElementById("resultsStatus").innerText = "";
+            window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
           });
         } else {
           document.getElementById("loginSection").style.display = "block";
