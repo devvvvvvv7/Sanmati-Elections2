@@ -173,7 +173,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
       if (!user) {
-        window.location.href = "/Sanmati-Elections/admin.html";
+        window.location.href = "/Sanmati-Elections2/admin.html";
         return;
       }
       db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
