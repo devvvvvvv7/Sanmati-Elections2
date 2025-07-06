@@ -36,7 +36,7 @@
   <div class="container">
     <div id="loginSection">
       <h2>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn&;s" alt="Ballot Box">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShMvk58PfOhHr55_V-XRPYHM45sW4zFrsMOA&s" alt="Ballot Box">
         Voter Login
       </h2>
       <div class="form-group">
@@ -52,7 +52,7 @@
     </div>
     <div id="votingSection" style="display: none;">
       <h2>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn&;s" alt="Ballot Box">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShMvk58PfOhHr55_V-XRPYHM45sW4zFrsMOA&s" alt="Ballot Box">
         Sanmati Higher Secondary School Election Voting
       </h2>
       <div class="form-group">
@@ -152,14 +152,6 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
-      .then(() => {
-        console.log("Session persistence set successfully");
-      })
-      .catch(err => {
-        console.error("Error setting persistence:", err.message);
-      });
-
     function isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
@@ -170,7 +162,7 @@
       const pass = document.getElementById("userPass").value;
       const loginStatus = document.getElementById("loginStatus");
       if (!email || !isValidEmail(email)) {
-        loginStatus.innerText = "膜Please enter a valid email address.";
+        loginStatus.innerText = "Please enter a valid email address.";
         loginStatus.classList.add("error");
         setTimeout(() => {
           loginStatus.innerText = "";
@@ -198,12 +190,9 @@
               document.getElementById("logoutButton").style.display = "none";
               document.getElementById("adminLink").style.display = "none";
               loginStatus.innerText = "";
-            } else if (data && data.role === "admin") {
-              console.log("Admin authenticated, redirecting to admin panel");
-              window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/admin.html";
             } else {
               auth.signOut();
-              loginStatus.innerText = "Access denied: Invalid account.";
+              loginStatus.innerText = "Access denied: Not a user account.";
               loginStatus.classList.add("error");
               setTimeout(() => {
                 loginStatus.innerText = "";
@@ -299,13 +288,16 @@
     }
 
     function logout() {
+      console.log("Logout initiated");
       auth.signOut().then(() => {
+        console.log("User signed out successfully");
         document.getElementById("loginSection").style.display = "block";
         document.getElementById("votingSection").style.display = "none";
         document.getElementById("logoutButton").style.display = "none";
         document.getElementById("adminLink").style.display = "none";
         window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
       }).catch(err => {
+        console.error("Logout error:", err.message);
         document.getElementById("status").innerText = `Error logging out: ${err.message}`;
         document.getElementById("status").classList.add("error");
         setTimeout(() => {
@@ -316,16 +308,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Ensure initial state
       document.getElementById("logoutButton").style.display = "none";
       document.getElementById("adminLink").style.display = "none";
-
-      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
-        .then(() => {
-          console.log("Session persistence set successfully");
-        })
-        .catch(err => {
-          console.error("Error setting persistence:", err.message);
-        });
 
       auth.onAuthStateChanged(user => {
         if (user) {
@@ -334,18 +319,13 @@
             if (data && data.role === "user") {
               console.log("User authenticated, showing voting section");
               document.getElementById("loginSection").style.display = "none";
-              document.getElementById("voting
-
-System: Section").style.display = "block";
+              document.getElementById("votingSection").style.display = "block";
               document.getElementById("logoutButton").style.display = "none";
               document.getElementById("adminLink").style.display = "none";
-            } else if (data && data.role === "admin") {
-              console.log("Admin authenticated, redirecting to admin panel");
-              window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/admin.html";
             } else {
               auth.signOut();
-              console.log("Access denied: Not a valid account");
-              document.getElementById("loginStatus").innerText = "Access denied: Invalid account.";
+              console.log("Access denied: Not a user account");
+              document.getElementById("loginStatus").innerText = "Access denied: Not a user account.";
               document.getElementById("loginStatus").classList.add("error");
               setTimeout(() => {
                 document.getElementById("loginStatus").innerText = "";
