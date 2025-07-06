@@ -9,142 +9,27 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Same styles as provided */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #e0e7ff, #c3dafe);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .container {
-      background: #ffffff;
-      border-radius: 15px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      padding: 40px;
-      max-width: 600px;
-      width: 100%;
-      margin: 20px;
-    }
-    h2 {
-      text-align: center;
-      color: #1e40af;
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    h2 img {
-      width: 40px;
-      height: 40px;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #1f2937;
-      margin-bottom: 8px;
-    }
-    input,
-    select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1rem;
-      color: #1f2937;
-      background: #f9fafb;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-    button:hover {
-      background: #2563eb;
-      transform: translateY(-2px);
-    }
-    button:active {
-      transform: translateY(0);
-    }
-    #status, #loginStatus {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #15803d;
-    }
-    #status.error, #loginStatus.error {
-      color: #dc2626;
-    }
-    #adminLink {
-      text-align: center;
-      margin-top: 20px;
-    }
-    #adminLink a {
-      color: #3b82f6;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1rem;
-      transition: color 0.3s;
-    }
-    #adminLink a:hover {
-      color: #2563eb;
-      text-decoration: underline;
-    }
-    #logoutButton {
-      display: none;
-      width: 100%;
-      padding: 14px;
-      background: #dc2626;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      margin-top: 10px;
-    }
-    #logoutButton:hover {
-      background: #b91c1c;
-      transform: translateY(-2px);
-    }
-    #logoutButton:active {
-      transform: translateY(0);
-    }
-    @media (max-width: 480px) {
-      .container { padding: 20px; }
-      h2 { font-size: 1.5rem; }
-      button { font-size: 1rem; padding: 12px; }
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #e0e7ff, #c3dafe); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .container { background: #ffffff; border-radius: 15px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); padding: 40px; max-width: 600px; width: 100%; margin: 20px; }
+    h2 { text-align: center; color: #1e40af; font-size: 2rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    h2 img { width: 40px; height: 40px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 0.9rem; font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+    input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background: #f9fafb; transition: border-color 0.3s, box-shadow 0.3s; }
+    input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    button { width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background 0.3s, transform 0.2s; }
+    button:hover { background: #2563eb; transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+    #status, #loginStatus { text-align: center; margin-top: 20px; font-size: 1rem; font-weight: 500; color: #15803d; }
+    #status.error, #loginStatus.error { color: #dc2626; }
+    #adminLink { display: none; text-align: center; margin-top: 20px; }
+    #adminLink a { color: #3b82f6; text-decoration: none; font-weight: 600; font-size: 1rem; transition: color 0.3s; }
+    #adminLink a:hover { color: #2563eb; text-decoration: underline; }
+    #logoutButton { display: none; width: 100%; padding: 14px; background: #dc2626; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background 0.3s, transform 0.2s; margin-top: 10px; }
+    #logoutButton:hover { background: #b91c1c; transform: translateY(-2px); }
+    #logoutButton:active { transform: translateY(0); }
+    @media (max-width: 480px) { .container { padding: 20px; } h2 { font-size: 1.5rem; } button { font-size: 1rem; padding: 12px; } }
   </style>
 </head>
 <body>
@@ -246,10 +131,10 @@
       </div>
       <button onclick="submitVote()">Submit Vote</button>
       <p id="status"></p>
-      <div id="adminLink">
-        <a href="/Sanmati-Elections/admin.html">Admin Login</a>
+      <div id="adminLink" style="display: none;">
+        <a href="https://devvvvvvv7.github.io/Sanmati-Elections2/admin.html">Admin Login</a>
       </div>
-      <button id="logoutButton" onclick="logout()">Logout</button>
+      <button id="logoutButton" onclick="logout()" style="display: none;">Logout</button>
     </div>
   </div>
   <script>
@@ -302,6 +187,8 @@
             if (data && data.role === "user") {
               document.getElementById("loginSection").style.display = "none";
               document.getElementById("votingSection").style.display = "block";
+              document.getElementById("logoutButton").style.display = "none"; // Hidden by default
+              document.getElementById("adminLink").style.display = "none"; // Hidden by default
               loginStatus.innerText = "";
             } else {
               auth.signOut();
@@ -405,8 +292,8 @@
         document.getElementById("loginSection").style.display = "block";
         document.getElementById("votingSection").style.display = "none";
         document.getElementById("logoutButton").style.display = "none";
-        document.getElementById("adminLink").style.display = "block";
-        window.location.reload();
+        document.getElementById("adminLink").style.display = "none";
+        window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
       }).catch(err => {
         document.getElementById("status").innerText = `Error logging out: ${err.message}`;
         document.getElementById("status").classList.add("error");
@@ -425,8 +312,8 @@
             if (data && data.role === "user") {
               document.getElementById("loginSection").style.display = "none";
               document.getElementById("votingSection").style.display = "block";
-              document.getElementById("logoutButton").style.display = "none"; // Initially hidden
-              document.getElementById("adminLink").style.display = "block";
+              document.getElementById("logoutButton").style.display = "none"; // Hidden by default
+              document.getElementById("adminLink").style.display = "none"; // Hidden by default
             } else {
               auth.signOut();
               document.getElementById("loginStatus").innerText = "Access denied: Not a user account.";
@@ -454,13 +341,14 @@
               adminLink.style.display = "none";
             } else {
               logoutButton.style.display = "none";
-              adminLink.style.display = "block";
             }
           } else if (event.key === 'A' || event.key === 'a') {
             event.preventDefault();
             const adminLink = document.getElementById("adminLink");
+            const logoutButton = document.getElementById("logoutButton");
             if (adminLink.style.display === "none") {
               adminLink.style.display = "block";
+              logoutButton.style.display = "none";
             } else {
               adminLink.style.display = "none";
             }
