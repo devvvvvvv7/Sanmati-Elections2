@@ -158,7 +158,7 @@
   <div class="container">
     <div id="loginSection">
       <h2>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q= alt="Sanmati Logo">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn; alt="Sanmati Logo">
         Admin Login - Sanmati Higher Secondary School
       </h2>
       <div class="form-group">
@@ -175,7 +175,7 @@
     </div>
     <div id="adminPanel" style="display: none;">
       <h2>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q= alt="Sanmati Logo">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn; alt="Sanmati Logo">
         Live Voting Results
       </h2>
       <p id="resultsStatus"></p>
@@ -196,19 +196,10 @@
       appId: "1:570288641949:web:5e8c6d3757a93a8df74174",
       measurementId: "G-C01THSMTX4"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
     const posts = ["disciplineAdvisor", "culturalAdvisor", "culturalMinister", "homeChiefMinister"];
-
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
-      .then(() => {
-        console.log("Session persistence set successfully");
-      })
-      .catch(err => {
-        console.error("Error setting persistence:", err.message);
-      });
 
     function isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -276,7 +267,6 @@
         document.getElementById("resultsStatus").innerText = "";
         document.getElementById("adminEmail").value = "";
         document.getElementById("adminPass").value = "";
-        window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
       }).catch(err => {
         document.getElementById("resultsStatus").innerText = `Error logging out: ${err.message}`;
         document.getElementById("resultsStatus").classList.remove("success");
@@ -339,12 +329,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (!firebase.database) {
-        console.error("Firebase database module not loaded correctly");
-        document.getElementById("loginStatus").innerText = "Error: Firebase database not initialized.";
-        return;
-      }
-
       auth.onAuthStateChanged(user => {
         if (user) {
           db.ref(`authorizedUsers/${user.uid}`).once("value", snapshot => {
@@ -361,15 +345,7 @@
               document.getElementById("adminPanel").style.display = "none";
               document.getElementById("results").innerHTML = "";
               document.getElementById("resultsStatus").innerText = "";
-              window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
             }
-          }).catch(err => {
-            document.getElementById("loginStatus").innerText = `Error checking user role: ${err.message}`;
-            document.getElementById("loginSection").style.display = "block";
-            document.getElementById("adminPanel").style.display = "none";
-            document.getElementById("results").innerHTML = "";
-            document.getElementById("resultsStatus").innerText = "";
-            window.location.href = "https://devvvvvvv7.github.io/Sanmati-Elections2/";
           });
         } else {
           document.getElementById("loginSection").style.display = "block";
@@ -378,7 +354,6 @@
           document.getElementById("resultsStatus").innerText = "";
         }
       });
-
       document.getElementById("loginButton").addEventListener("click", adminLogin);
     });
   </script>
