@@ -119,6 +119,27 @@
       color: #2563eb;
       text-decoration: underline;
     }
+    #logoutButton {
+      display: none;
+      width: 100%;
+      padding: 14px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      margin-top: 10px;
+    }
+    #logoutButton:hover {
+      background: #b91c1c;
+      transform: translateY(-2px);
+    }
+    #logoutButton:active {
+      transform: translateY(0);
+    }
     @media (max-width: 480px) {
       .container { padding: 20px; }
       h2 { font-size: 1.5rem; }
@@ -228,6 +249,7 @@
       <div id="adminLink">
         <a href="/Sanmati-Elections/admin.html">Admin Login</a>
       </div>
+      <button id="logoutButton" onclick="logout()">Logout</button>
     </div>
   </div>
   <script>
@@ -351,7 +373,7 @@
               culturalMinister: cm,
               homeChiefMinister: hcm
             },
-            userId: user.uid // Store user UID for tracking
+            userId: user.uid
           }).then(() => {
             status.innerText = "✅ Vote submitted successfully!";
             status.classList.remove("error");
@@ -378,6 +400,23 @@
       });
     }
 
+    function logout() {
+      auth.signOut().then(() => {
+        document.getElementById("loginSection").style.display = "block";
+        document.getElementById("votingSection").style.display = "none";
+        document.getElementById("logoutButton").style.display = "none";
+        document.getElementById("adminLink").style.display = "block";
+        window.location.reload();
+      }).catch(err => {
+        document.getElementById("status").innerText = `Error logging out: ${err.message}`;
+        document.getElementById("status").classList.add("error");
+        setTimeout(() => {
+          document.getElementById("status").innerText = "";
+          document.getElementById("status").classList.remove("error");
+        }, 3000);
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       auth.onAuthStateChanged(user => {
         if (user) {
@@ -386,6 +425,8 @@
             if (data && data.role === "user") {
               document.getElementById("loginSection").style.display = "none";
               document.getElementById("votingSection").style.display = "block";
+              document.getElementById("logoutButton").style.display = "none"; // Initially hidden
+              document.getElementById("adminLink").style.display = "block";
             } else {
               auth.signOut();
               document.getElementById("loginStatus").innerText = "Access denied: Not a user account.";
@@ -399,6 +440,31 @@
         } else {
           document.getElementById("loginSection").style.display = "block";
           document.getElementById("votingSection").style.display = "none";
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.ctrlKey && event.shiftKey) {
+          if (event.key === '1') {
+            event.preventDefault();
+            const logoutButton = document.getElementById("logoutButton");
+            const adminLink = document.getElementById("adminLink");
+            if (logoutButton.style.display === "none") {
+              logoutButton.style.display = "block";
+              adminLink.style.display = "none";
+            } else {
+              logoutButton.style.display = "none";
+              adminLink.style.display = "block";
+            }
+          } else if (event.key === 'A' || event.key === 'a') {
+            event.preventDefault();
+            const adminLink = document.getElementById("adminLink");
+            if (adminLink.style.display === "none") {
+              adminLink.style.display = "block";
+            } else {
+              adminLink.style.display = "none";
+            }
+          }
         }
       });
     });
